@@ -16,7 +16,18 @@ const projectSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, "Project Category is required"],
-    enum: ["Climate", "Health", "Education", "Finance", "Other"],
+    enum: [
+      "AI/ML",
+      "FinTech",
+      "HealthTech",
+      "EdTech",
+      "CleanTech",
+      "Enterprise",
+      "Consumer",
+      "Social",
+      "Gaming",
+      "Other",
+    ],
     default: "Other",
   },
   postedBy: {
@@ -50,7 +61,7 @@ const projectSchema = new mongoose.Schema({
       },
       url: {
         type: String,
-       default:"",
+        default: "",
       },
     },
   },
@@ -84,16 +95,19 @@ const projectSchema = new mongoose.Schema({
   },
 });
 
-projectSchema.index({
-  title: 'text',
-  description: 'text',
-  tags: 'text'
-}, {
-  weights: {
-    title: 5,
-    tags: 3,
-    description: 1
+projectSchema.index(
+  {
+    title: "text",
+    description: "text",
+    tags: "text",
+  },
+  {
+    weights: {
+      title: 5,
+      tags: 3,
+      description: 1,
+    },
   }
-});
+);
 
 export const Project = mongoose.model("Project", projectSchema);

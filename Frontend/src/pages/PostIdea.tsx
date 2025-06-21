@@ -1,66 +1,140 @@
-
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Upload, Tag, Eye, X } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Upload, Tag, Eye, X } from "lucide-react";
+import { toast } from "sonner";
+import axios from "axios";
+import { useAuth } from "@/context/authContext";
+import { useNavigate } from "react-router-dom";
 
 const PostIdea = () => {
-  const [formData, setFormData] = useState({
-    title: '',
-    shortDescription: '',
-    fullDescription: '',
-    category: '',
-    tags: [],
-    image: null
+  const { isAuthorized, setUser } = useAuth();
+  const navigateTo = useNavigate();
+
+  const [userData, setUserData] = useState({
+    name: "Your Name",
+    profilepic: null,
   });
-  
-  const [currentTag, setCurrentTag] = useState('');
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!isAuthorized) {
+        navigateTo("/auth");
+        return;
+      }
+      try {
+        const { data } = await axios.get(
+          "http://localhost:4000/api/v1/user/getuser",
+          {
+            withCredentials: true,
+          }
+        );
+        setUserData({
+          name: data.user.name || "Your Name",
+          profilepic: data.user.profilepic?.url || null,
+        });
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          navigateTo("/");
+        } else {
+          toast.error("Failed to fetch user data");
+          console.error("Error fetching user data:", error);
+        }
+      }
+    };
+
+    fetchUser();
+  }, [isAuthorized, navigateTo]);
+
+  const [formData, setFormData] = useState({
+    title: "",
+    shortDescription: "",
+    fullDescription: "",
+    category: "",
+    tags: [],
+    image: null,
+  });
+
+  const [currentTag, setCurrentTag] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const categories = [
-    'AI/ML', 'FinTech', 'HealthTech', 'EdTech', 'CleanTech', 
-    'Enterprise', 'Consumer', 'Social', 'Gaming', 'Other'
+    "AI/ML",
+    "FinTech",
+    "HealthTech",
+    "EdTech",
+    "CleanTech",
+    "Enterprise",
+    "Consumer",
+    "Social",
+    "Gaming",
+    "Other",
   ];
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const addTag = () => {
     if (currentTag.trim() && !formData.tags.includes(currentTag.trim())) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        tags: [...prev.tags, currentTag.trim()]
+        tags: [...prev.tags, currentTag.trim()],
       }));
-      setCurrentTag('');
+      setCurrentTag("");
     }
   };
 
   const removeTag = (tagToRemove) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({ ...prev, image: file }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    console.log('Submitting idea:', formData);
-    setIsSubmitting(false);
-    
-    // Reset form
-    setFormData({
-      title: '',
-      shortDescription: '',
-      fullDescription: '',
-      category: '',
-      tags: [],
-      image: null
-    });
+
+    try {
+      const data = new FormData();
+      data.append("title", formData.title);
+      data.append("description", formData.fullDescription);
+      data.append("category", formData.category);
+      formData.tags.forEach((tag) => data.append("tags", tag));
+      if (formData.image) data.append("file", formData.image);
+
+      const response = await axios.post(
+        "http://localhost:4000/api/v1/project/post",
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+
+      toast.success(response.data.message);
+      setFormData({
+        title: "",
+        shortDescription: "",
+        fullDescription: "",
+        category: "",
+        tags: [],
+        image: null,
+      });
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -76,7 +150,8 @@ const PostIdea = () => {
             Share Your Startup Idea
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Turn your vision into reality by sharing it with our community of innovators
+            Turn your vision into reality by sharing it with our community of
+            innovators
           </p>
         </motion.div>
 
@@ -88,7 +163,10 @@ const PostIdea = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="lg:col-span-2"
           >
-            <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white rounded-2xl shadow-xl p-8 space-y-6"
+            >
               {/* Title */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
@@ -97,7 +175,7 @@ const PostIdea = () => {
                 <input
                   type="text"
                   value={formData.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  onChange={(e) => handleInputChange("title", e.target.value)}
                   placeholder="e.g., AI-Powered Fitness Coach"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   required
@@ -111,25 +189,32 @@ const PostIdea = () => {
                 </label>
                 <select
                   value={formData.category}
-                  onChange={(e) => handleInputChange('category', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("category", e.target.value)
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   required
                 >
                   <option value="">Select a category</option>
-                  {categories.map(category => (
-                    <option key={category} value={category}>{category}</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
                   ))}
                 </select>
               </div>
 
               {/* Short Description */}
+              {/* Currently not updating in database because database don't have short desciption field  */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Short Description * (for card preview)
                 </label>
                 <textarea
                   value={formData.shortDescription}
-                  onChange={(e) => handleInputChange('shortDescription', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("shortDescription", e.target.value)
+                  }
                   placeholder="A brief, engaging description that will appear on your idea card..."
                   rows={3}
                   maxLength={200}
@@ -148,7 +233,9 @@ const PostIdea = () => {
                 </label>
                 <textarea
                   value={formData.fullDescription}
-                  onChange={(e) => handleInputChange('fullDescription', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("fullDescription", e.target.value)
+                  }
                   placeholder="Provide detailed information about your idea, target market, potential impact, and implementation approach..."
                   rows={6}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all resize-none"
@@ -183,7 +270,9 @@ const PostIdea = () => {
                     type="text"
                     value={currentTag}
                     onChange={(e) => setCurrentTag(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                    onKeyPress={(e) =>
+                      e.key === "Enter" && (e.preventDefault(), addTag())
+                    }
                     placeholder="Add a tag..."
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
@@ -198,18 +287,55 @@ const PostIdea = () => {
               </div>
 
               {/* Image Upload */}
+
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
-                  Image (Optional)
+                  Image
                 </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-green-400 transition-colors">
-                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-2">
-                    Drop an image here, or <span className="text-green-600 font-medium">browse</span>
-                  </p>
-                  <p className="text-sm text-gray-500">PNG, JPG, GIF up to 10MB</p>
-                  <input type="file" className="hidden" accept="image/*" />
-                </div>
+
+                {formData.image ? (
+                  <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                    <img
+                      src={URL.createObjectURL(formData.image)}
+                      alt="Preview"
+                      className="mx-auto h-48 object-contain rounded-md"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormData((prev) => ({ ...prev, image: null }))
+                      }
+                      className="absolute top-2 right-2 bg-white p-1 rounded-full shadow hover:bg-red-100"
+                    >
+                      <X size={16} className="text-red-500" />
+                    </button>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="image-upload"
+                    className="cursor-pointer block"
+                  >
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-green-400 transition-colors">
+                      <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600 mb-2">
+                        Drop an image here, or{" "}
+                        <span className="text-green-600 font-medium">
+                          browse
+                        </span>
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        PNG, JPG, GIF up to 10MB
+                      </p>
+                    </div>
+                    <input
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageChange}
+                    />
+                  </label>
+                )}
               </div>
 
               {/* Submit Button */}
@@ -226,7 +352,7 @@ const PostIdea = () => {
                     <span>Sharing Your Idea...</span>
                   </div>
                 ) : (
-                  'Share Your Idea'
+                  "Share Your Idea"
                 )}
               </motion.button>
             </form>
@@ -244,25 +370,46 @@ const PostIdea = () => {
                 <Eye className="w-5 h-5 text-gray-500" />
                 <h3 className="font-semibold text-gray-900">Live Preview</h3>
               </div>
-              
+
               {/* Card Preview */}
               <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-6">
                 <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-semibold text-sm">You</span>
-                  </div>
+                  {userData.profilepic ? (
+                    // Display Cloudinary profile picture if available
+                    <div className="w-10 h-10 rounded-full overflow-hidden">
+                      <img
+                        src={userData.profilepic}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    // Fallback gradient circle with user's initial
+                    <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
+                      <span className="text-white font-semibold text-sm">
+                        {userData.name
+                          ? userData.name.charAt(0).toUpperCase()
+                          : "Y"}
+                      </span>
+                    </div>
+                  )}
                   <div>
-                    <p className="font-semibold text-gray-900">Your Name</p>
-                    <p className="text-sm text-gray-500">{formData.category || 'Category'}</p>
+                    <p className="font-semibold text-gray-900">
+                      {userData.name}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {formData.category || "Category"}
+                    </p>
                   </div>
                 </div>
 
                 <h4 className="text-lg font-bold text-gray-900 mb-3">
-                  {formData.title || 'Your Idea Title'}
+                  {formData.title || "Your Idea Title"}
                 </h4>
-                
+
                 <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                  {formData.shortDescription || 'Your short description will appear here...'}
+                  {formData.shortDescription ||
+                    "Your short description will appear here..."}
                 </p>
 
                 {formData.tags.length > 0 && (
@@ -284,21 +431,29 @@ const PostIdea = () => {
                     <span>👁️ 0</span>
                     <span>💬 0</span>
                   </div>
-                  <span className="text-green-600 font-medium">View Details</span>
+                  <span className="text-green-600 font-medium">
+                    View Details
+                  </span>
                 </div>
               </div>
             </div>
 
             <div className="bg-white rounded-2xl shadow-xl p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">💡 Tips for Success</h3>
+              <h3 className="font-semibold text-gray-900 mb-4">
+                💡 Tips for Success
+              </h3>
               <ul className="space-y-3 text-sm text-gray-600">
                 <li className="flex items-start space-x-2">
                   <span className="text-green-500 font-bold">•</span>
-                  <span>Write a clear, compelling title that grabs attention</span>
+                  <span>
+                    Write a clear, compelling title that grabs attention
+                  </span>
                 </li>
                 <li className="flex items-start space-x-2">
                   <span className="text-green-500 font-bold">•</span>
-                  <span>Use relevant tags to help others discover your idea</span>
+                  <span>
+                    Use relevant tags to help others discover your idea
+                  </span>
                 </li>
                 <li className="flex items-start space-x-2">
                   <span className="text-green-500 font-bold">•</span>

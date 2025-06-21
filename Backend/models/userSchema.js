@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
       },
    bio: {
     type: String,
-    default: "This is my Bio",
+    required: [true, "Please enter your Bio!"],
   },
   savedProjects: [
     {

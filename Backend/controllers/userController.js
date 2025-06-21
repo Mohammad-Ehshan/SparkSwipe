@@ -5,7 +5,7 @@ import { sendToken } from "../utils/jwtToken.js";
 import cloudinary from "cloudinary";
 
 export const register = catchAsyncErrors(async (req, res, next) => {
-  const { name, email, phone, password } = req.body;
+  const { name, email, phone, password,bio } = req.body;
 
   const {profilepic} = req.files;
   if (!profilepic) {
@@ -24,7 +24,7 @@ export const register = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Failed to upload media.", 500));
   }
 
-  if (!name || !email || !phone || !password) {
+  if (!name || !email || !phone || !password || !bio) {
     return next(new ErrorHandler("Please fill full form!"));
   }
   const isEmail = await User.findOne({ email });
@@ -36,6 +36,7 @@ export const register = catchAsyncErrors(async (req, res, next) => {
     email,
     phone,
     password,
+    bio,
     profilepic: {
       public_id: cloudinaryResponse.public_id,
       url: cloudinaryResponse.secure_url,

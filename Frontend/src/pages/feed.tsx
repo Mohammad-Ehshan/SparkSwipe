@@ -4,8 +4,8 @@ import StartupCard from '@/components/feed/StartupCard';
 // import BottomNavigation from '@/components/navigation/BottomNavigation';
 import { motion } from 'framer-motion';
 import FeedTopBar from '@/components/feed/FeedTopBar';
-import FeedFilters from '@/components/feed/feedFilters';
 import Navigation from '@/components/Navigation';
+import FeedFilters from '@/components/feed/FeedFilters';
 
 // Mock data for startup ideas
 const mockStartups = [
