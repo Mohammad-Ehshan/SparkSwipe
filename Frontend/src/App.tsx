@@ -3,12 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
 import Navigation from "./components/Navigation";
 import Index from "./pages/Index";
@@ -23,7 +18,8 @@ import Auth from "./pages/Auth";
 
 import axios from "axios";
 import { useAuth } from "./context/authContext";
-useAuth
+import RandomIdea from "./pages/RandomIdea";
+useAuth;
 
 const queryClient = new QueryClient();
 
@@ -63,6 +59,7 @@ function AppWrapper() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/idea/:id" element={<IdeaDetail />} />
         <Route path="/feed" element={<Feed />} />
+        <Route path="/rand-idea" element={<RandomIdea />} />
         {/* <Route path="/feed/:id" element={<Idea />} /> */}
         <Route path="/auth" element={<Auth />} />
         <Route path="*" element={<NotFound />} />
@@ -85,33 +82,7 @@ const App = () => (
 
 export default App;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// without authentication 
+// without authentication
 // import { Toaster } from "@/components/ui/toaster";
 // import { Toaster as Sonner } from "@/components/ui/sonner";
 // import { TooltipProvider } from "@/components/ui/tooltip";
@@ -135,7 +106,6 @@ export default App;
 // import Auth from "./pages/Auth";
 
 // const queryClient = new QueryClient();
-
 
 // function AppWrapper() {
 //   const location = useLocation();
@@ -173,27 +143,6 @@ export default App;
 // );
 
 // export default App;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import { Toaster } from "@/components/ui/toaster";
 // import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -239,12 +188,3 @@ export default App;
 // );
 
 // export default App;
-
-
-
-
-
-
-
-
-
