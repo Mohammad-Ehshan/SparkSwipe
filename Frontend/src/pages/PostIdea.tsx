@@ -4,7 +4,7 @@ import { Upload, Tag, Eye, X } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useAuth } from "@/context/authContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const PostIdea = () => {
   const { isAuthorized, setUser } = useAuth();
@@ -23,7 +23,7 @@ const PostIdea = () => {
       }
       try {
         const { data } = await axios.get(
-          "http://localhost:4000/api/v1/user/getuser",
+          "https://sparkswipebackend.onrender.com/api/v1/user/getuser",
           {
             withCredentials: true,
           }
@@ -111,7 +111,7 @@ const PostIdea = () => {
       if (formData.image) data.append("file", formData.image);
 
       const response = await axios.post(
-        "http://localhost:4000/api/v1/project/post",
+        "https://sparkswipebackend.onrender.com/api/v1/project/post",
         data,
         {
           headers: {
@@ -147,7 +147,7 @@ const PostIdea = () => {
           className="text-center mb-8"
         >
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Share Your Startup Idea
+            Share Your Startup Idea <Link to="/rand-idea"> <span className="text-blue-600 underline">With AI</span></Link>
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Turn your vision into reality by sharing it with our community of

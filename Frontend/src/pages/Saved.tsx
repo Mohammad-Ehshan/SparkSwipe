@@ -7,47 +7,66 @@ const Saved = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('recent');
 
+
   const savedIdeas = [
-    {
-      id: '1',
-      title: 'AI-Powered Sustainability Tracker',
-      description: 'A mobile app that uses AI to track and gamify personal carbon footprint reduction.',
-      category: 'CleanTech',
-      tags: ['AI', 'Sustainability', 'Mobile'],
-      likes: 234,
-      views: 1250,
-      comments: 43,
-      savedAt: '2024-01-15',
-      author: 'Sarah Chen',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b77c?w=150&h=150&fit=crop&crop=face'
-    },
-    {
-      id: '2',
-      title: 'Remote Team VR Workspace',
-      description: 'Create immersive VR workspaces where remote teams can collaborate as if they were in the same room.',
-      category: 'Enterprise',
-      tags: ['VR', 'Remote Work', 'Collaboration'],
-      likes: 189,
-      views: 890,
-      comments: 32,
-      savedAt: '2024-01-14',
-      author: 'Marcus Johnson',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
-    },
-    {
-      id: '3',
-      title: 'Micro-Investment Platform for Gen Z',
-      description: 'A social investing app that allows users to invest spare change from daily purchases.',
-      category: 'FinTech',
-      tags: ['FinTech', 'Social', 'Investment'],
-      likes: 312,
-      views: 1580,
-      comments: 67,
-      savedAt: '2024-01-13',
-      author: 'Alex Rivera',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
-    }
-  ];
+  {
+    _id: 1,
+    title: "AI-Powered Sustainability Tracker",
+    description: "A mobile app that uses AI to track and gamify personal carbon footprint reduction.",
+    category: "CleanTech",
+    postedBy: "685961e91800e13a607357f8", // Assuming same author as "Calendo" and "FirmFlex"
+    tags: ["AI", "Sustainability", "Mobile"],
+    media: {}, // Placeholder (no media data in original)
+    likes: 23,
+    dislikes: 0, // Added to match schema
+    skip: 0,     // Added to match schema
+    views: 30,
+    commentsCount: 3, // Renamed from "comments"
+    reports: 0,       // Added to match schema
+    createdAt: "2024-01-15T00:00:00.000+00:00", // Replaced "savedAt" with ISO format
+    __v: 0,
+    author: "David Wan", // Optional (not in sample schema)
+    avatar: "https://res.cloudinary.com/dnwmgdyck/image/upload/v1750688235/lka8kkfeazauj0cnkopx.png" // Optional
+  },
+  {
+    _id: 2,
+    title: "Remote Team VR Workspace",
+    description: "Create immersive VR workspaces where remote teams can collaborate as if they were in the same room.",
+    category: "Enterprise",
+    postedBy: "6859627a1800e13a60735812", // Assuming same author as "UniShell"
+    tags: ["VR", "Remote Work", "Collaboration"],
+    media: {},
+    likes: 18,
+    dislikes: 0,
+    skip: 0,
+    views: 49,
+    commentsCount: 2,
+    reports: 0,
+    createdAt: "2024-01-14T00:00:00.000+00:00",
+    __v: 0,
+    author: "Marcus Johnson",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+  },
+  {
+    _id: 3,
+    title: "Micro-Investment Platform for Gen Z",
+    description: "A social investing app that allows users to invest spare change from daily purchases.",
+    category: "FinTech",
+    postedBy: "685961e91800e13a607357f8", // Reused author ID
+    tags: ["FinTech", "Social", "Investment"],
+    media: {},
+    likes: 12,
+    dislikes: 0,
+    skip: 0,
+    views: 15,
+    commentsCount: 6,
+    reports: 0,
+    createdAt: "2024-01-13T00:00:00.000+00:00",
+    __v: 0,
+    author: "Alex Rivera",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+  }
+];
 
   const handleViewIdea = (ideaId: string) => {
     console.log('Viewing idea:', ideaId);
@@ -117,7 +136,7 @@ const Saved = () => {
             { label: 'Total Saved', value: savedIdeas.length, icon: <Heart className="w-5 h-5" /> },
             { label: 'This Week', value: '2', icon: <Clock className="w-5 h-5" /> },
             { label: 'Categories', value: '3', icon: <Filter className="w-5 h-5" /> },
-            { label: 'Total Likes', value: '735', icon: <Heart className="w-5 h-5" /> }
+            { label: 'Total Likes', value: '49', icon: <Heart className="w-5 h-5" /> }
           ].map((stat, index) => (
             <div key={index} className="bg-white rounded-xl p-4 shadow-lg">
               <div className="flex items-center space-x-2 mb-2">

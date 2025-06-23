@@ -7,10 +7,10 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState('posted');
 
   const userStats = {
-    posted: 12,
-    likes: 1205,
-    saved: 34,
-    followers: 156
+    posted: 4,
+    likes: 49,
+    saved: 3,
+    followers: 15
   };
 
   const userIdeas = [
@@ -32,9 +32,9 @@ const Profile = () => {
       description: 'Connect consumers with nearby small businesses through AR-powered exploration.',
       category: 'Consumer',
       tags: ['AR', 'Local', 'Discovery'],
-      likes: 156,
-      views: 892,
-      comments: 28,
+      likes: 48,
+      views: 154,
+      comments: 12,
       status: 'active',
       postedAt: '2024-01-10'
     }
@@ -60,7 +60,7 @@ const Profile = () => {
             <div className="flex items-center space-x-6">
               <div className="relative">
                 <img
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+                  src="https://res.cloudinary.com/dnwmgdyck/image/upload/v1750688380/wp6spgklqyu3mvbcv3pq.png"
                   alt="Profile"
                   className="w-24 h-24 rounded-full object-cover border-4 border-green-100"
                 />
@@ -70,7 +70,7 @@ const Profile = () => {
               </div>
               
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 mb-1">Alex Chen</h1>
+                <h1 className="text-2xl font-bold text-gray-900 mb-1">Selina Williams</h1>
                 <p className="text-gray-600 mb-2">Product Manager & Entrepreneur</p>
                 <p className="text-sm text-gray-500 max-w-md">
                   Passionate about building products that make a positive impact. 

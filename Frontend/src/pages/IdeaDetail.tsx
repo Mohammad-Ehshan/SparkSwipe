@@ -1,86 +1,92 @@
-
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Heart, Eye, MessageCircle, Share, Flag, Send, ThumbsUp } from 'lucide-react';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useParams, Link } from "react-router-dom";
+import {
+  ArrowLeft,
+  Heart,
+  Eye,
+  MessageCircle,
+  Share,
+  Flag,
+  Send,
+  ThumbsUp,
+} from "lucide-react";
 
 const IdeaDetail = () => {
   const { id } = useParams();
   const [isLiked, setIsLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  const [newComment, setNewComment] = useState('');
+  const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState([
     {
       id: 1,
-      author: 'Emily Davis',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop&crop=face',
-      text: 'This is exactly what the sustainability space needs! Have you considered partnering with grocery chains?',
-      time: '2h ago',
-      likes: 12
+      author: "Emily Davis",
+      avatar:
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop&crop=face",
+      text: "This is exactly what the sustainability space needs! Have you considered partnering with grocery chains?",
+      time: "2h ago",
+      likes: 12,
     },
     {
       id: 2,
-      author: 'James Wilson',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face',
-      text: 'Love the gamification aspect. Would be interested in investing if you need funding.',
-      time: '4h ago',
-      likes: 8
+      author: "James Wilson",
+      avatar:
+        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face",
+      text: "Love the gamification aspect. Would be interested in investing if you need funding.",
+      time: "4h ago",
+      likes: 8,
     },
     {
       id: 3,
-      author: 'Maria Rodriguez',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b77c?w=50&h=50&fit=crop&crop=face',
-      text: 'The AI component could be revolutionary. How accurate is the carbon tracking?',
-      time: '6h ago',
-      likes: 5
-    }
+      author: "Maria Rodriguez",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b77c?w=50&h=50&fit=crop&crop=face",
+      text: "The AI component could be revolutionary. How accurate is the carbon tracking?",
+      time: "6h ago",
+      likes: 5,
+    },
   ]);
 
   // Mock data - in real app this would come from API
   const idea = {
-    id: id || '1',
-    title: 'AI-Powered Sustainability Tracker',
-    description: `A comprehensive mobile application that leverages artificial intelligence to track and gamify personal carbon footprint reduction. 
-
-The app works by allowing users to scan receipts, log daily activities, and receive personalized recommendations to reduce their environmental impact. 
-
-Key features include:
-• AI-powered receipt scanning for automatic carbon calculations
-• Gamified challenges and rewards system
-• Social features to compete with friends and family
-• Integration with smart home devices
-• Real-time carbon offset marketplace
-• Educational content and tips
-• Progress tracking and analytics
-
-The market opportunity is huge with growing environmental consciousness and the need for accessible sustainability tools. We're targeting environmentally conscious millennials and Gen Z users who want to make a positive impact but need guidance and motivation.
-
-Our revenue model includes freemium subscriptions, carbon offset commissions, and partnerships with eco-friendly brands.`,
-    tags: ['AI', 'Sustainability', 'Mobile', 'Gamification', 'CleanTech'],
-    category: 'CleanTech',
-    likes: 234,
-    views: 1250,
+    id: id || "1",
+    title: "FirmFlex – AI-Driven Legal Services Platform",
+    description:
+      "A cutting-edge legal tech platform that empowers law firms to deliver on-demand legal services without the constraints of hourly billing or fixed retainers.\n\nFirmFlex leverages AI and automation to streamline legal workflows, enhance efficiency, and provide flexible, client-centric solutions.\n\nKey Features Include:\n• On-Demand Legal Services – Clients access legal support as needed, without retainers or rigid contracts.\n• No Time-Bound Billing – Transparent, value-based pricing instead of traditional hourly rates.\n• AI-Powered Legal Assistance – Smart document review, contract analysis, and case research automation.\n• Flexible Client Engagement – Subscription-based or pay-per-use models tailored to different needs.\n• Seamless Collaboration Tools – Secure client portals, real-time updates, and integrated communication.\n• Performance Analytics – Track case progress, client satisfaction, and firm efficiency with data-driven insights.\n\nMarket Opportunity:\nThe legal industry is shifting toward flexible, tech-driven solutions. Firms are seeking ways to reduce overhead, attract modern clients, and compete with alternative legal service providers. FirmFlex targets forward-thinking law firms, solo practitioners, and in-house legal teams looking to optimize operations and improve client retention.\n\nRevenue Model:\n• Platform Subscription Fees – Tiered pricing for firms based on size and usage.\n• Transaction-Based Commissions – For on-demand legal services facilitated through the platform.\n• Premium Add-Ons – Advanced AI tools, white-label solutions, and enterprise integrations.",
+    tags: [
+      "LegalTech",
+      "AI",
+      "On-Demand Services",
+      "Flexible Billing",
+      "Law Firms",
+    ],
+    category: "LegalTech",
+    likes: 17,
+    views: 45,
     comments: comments.length,
     trending: true,
-    author: 'Sarah Chen',
-    authorBio: 'Environmental Engineer & AI Enthusiast',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b77c?w=150&h=150&fit=crop&crop=face',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=400&fit=crop',
-    createdAt: '2 days ago'
+    author: "David Wan",
+    authorBio: "Environmental Engineer & AI Enthusiast",
+    avatar:
+      "https://res.cloudinary.com/dnwmgdyck/image/upload/v1750688235/lka8kkfeazauj0cnkopx.png",
+    image:
+      "https://res.cloudinary.com/dnwmgdyck/image/upload/v1750688677/Screenshot_2025-06-23_195053_diednl.png",
+    createdAt: "1 days ago",
   };
 
   const handleAddComment = () => {
     if (newComment.trim()) {
       const comment = {
         id: comments.length + 1,
-        author: 'You',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
+        author: "You",
+        avatar:
+          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face",
         text: newComment,
-        time: 'now',
-        likes: 0
+        time: "now",
+        likes: 0,
       };
       setComments([comment, ...comments]);
-      setNewComment('');
+      setNewComment("");
     }
   };
 
@@ -146,7 +152,9 @@ Our revenue model includes freemium subscriptions, carbon offset commissions, an
                 className="w-16 h-16 rounded-full object-cover"
               />
               <div>
-                <h3 className="font-semibold text-gray-900 text-lg">{idea.author}</h3>
+                <h3 className="font-semibold text-gray-900 text-lg">
+                  {idea.author}
+                </h3>
                 <p className="text-gray-500">{idea.authorBio}</p>
                 <p className="text-sm text-gray-400">{idea.createdAt}</p>
               </div>
@@ -157,7 +165,9 @@ Our revenue model includes freemium subscriptions, carbon offset commissions, an
               <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full mb-3">
                 {idea.category}
               </span>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{idea.title}</h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                {idea.title}
+              </h1>
             </div>
 
             {/* Stats */}
@@ -167,18 +177,18 @@ Our revenue model includes freemium subscriptions, carbon offset commissions, an
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setIsLiked(!isLiked)}
                 className={`flex items-center space-x-2 transition-colors ${
-                  isLiked ? 'text-red-500' : 'hover:text-red-500'
+                  isLiked ? "text-red-500" : "hover:text-red-500"
                 }`}
               >
-                <Heart size={20} fill={isLiked ? 'currentColor' : 'none'} />
+                <Heart size={20} fill={isLiked ? "currentColor" : "none"} />
                 <span>{idea.likes + (isLiked ? 1 : 0)}</span>
               </motion.button>
-              
+
               <div className="flex items-center space-x-2">
                 <Eye size={20} />
                 <span>{idea.views}</span>
               </div>
-              
+
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -188,7 +198,7 @@ Our revenue model includes freemium subscriptions, carbon offset commissions, an
                 <MessageCircle size={20} />
                 <span>{comments.length}</span>
               </motion.button>
-              
+
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -230,7 +240,7 @@ Our revenue model includes freemium subscriptions, carbon offset commissions, an
               >
                 Connect with Creator
               </motion.button>
-              
+
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -247,7 +257,7 @@ Our revenue model includes freemium subscriptions, carbon offset commissions, an
           {showComments && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               className="mt-8 bg-white rounded-2xl shadow-xl overflow-hidden"
             >
@@ -255,7 +265,7 @@ Our revenue model includes freemium subscriptions, carbon offset commissions, an
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   Comments ({comments.length})
                 </h3>
-                
+
                 {/* Add Comment */}
                 <div className="flex space-x-3 mb-6">
                   <img
@@ -303,8 +313,12 @@ Our revenue model includes freemium subscriptions, carbon offset commissions, an
                     <div className="flex-1">
                       <div className="bg-gray-50 rounded-lg p-4">
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-semibold text-gray-900">{comment.author}</h4>
-                          <span className="text-sm text-gray-500">{comment.time}</span>
+                          <h4 className="font-semibold text-gray-900">
+                            {comment.author}
+                          </h4>
+                          <span className="text-sm text-gray-500">
+                            {comment.time}
+                          </span>
                         </div>
                         <p className="text-gray-700">{comment.text}</p>
                       </div>

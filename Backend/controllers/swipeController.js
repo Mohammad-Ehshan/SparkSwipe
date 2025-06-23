@@ -12,6 +12,68 @@ const SWIPE_SCORE_WEIGHTS = {
 };
 
 // Record swipe action
+// export const recordSwipe = catchAsyncErrors(async (req, res, next) => {
+//   const { projectId, action } = req.body;
+//   const userId = req.user._id;
+
+//   // Validate action type
+//   if (!['like', 'dislike', 'skip'].includes(action)) {
+//     return next(new ErrorHandler('Invalid swipe action. Must be like/dislike/skip', 400));
+//   }
+
+//   // Prevent duplicate swipes
+//   const existingSwipe = await Swipe.findOne({ userId, projectId });
+//   if (existingSwipe) {
+//     return next(new ErrorHandler('Project already swiped', 409));
+//   }
+
+//   // Get project
+//   const project = await Project.findById(projectId);
+//   if (!project) {
+//     return next(new ErrorHandler('Project not found', 404));
+//   }
+
+//   // Prevent swiping own projects
+//   if (project.postedBy.equals(userId)) {
+//     return next(new ErrorHandler("Cannot swipe your own project", 403));
+//   }
+
+//   // Create swipe record
+//   await Swipe.create({
+//     userId,
+//     projectId,
+//     action
+//   });
+
+//   // Prepare update object
+//   const updateData = {
+//     $inc: { views: 1 },
+//     $set: { lastSwipedAt: new Date() }
+//   };
+
+//   if (action === 'like') {
+//     updateData.$inc.likes = 1;
+
+//     // Add to user's liked projects
+//     await User.findByIdAndUpdate(userId, {
+//       $addToSet: { likedProjects: projectId }
+//     });
+//   } else if (action === 'dislike') {
+//     updateData.$inc.dislikes = 1;
+//   } else if (action === 'skip') {
+//     updateData.$inc.skip = 1;
+//   }
+
+//   await Project.findByIdAndUpdate(projectId, updateData, { new: true });
+
+//   res.status(201).json({
+//     success: true,
+//     message: `Project ${action}d`,
+//     action
+//   });
+// });
+
+
 export const recordSwipe = catchAsyncErrors(async (req, res, next) => {
   const { projectId, action } = req.body;
   const userId = req.user._id;
@@ -53,6 +115,7 @@ export const recordSwipe = catchAsyncErrors(async (req, res, next) => {
 
   if (action === 'like') {
     updateData.$inc.likes = 1;
+    updateData.$inc.swipeScore = SWIPE_SCORE_WEIGHTS.LIKE;
 
     // Add to user's liked projects
     await User.findByIdAndUpdate(userId, {
@@ -60,8 +123,10 @@ export const recordSwipe = catchAsyncErrors(async (req, res, next) => {
     });
   } else if (action === 'dislike') {
     updateData.$inc.dislikes = 1;
+    updateData.$inc.swipeScore = SWIPE_SCORE_WEIGHTS.DISLIKE;
   } else if (action === 'skip') {
     updateData.$inc.skip = 1;
+    updateData.$inc.swipeScore = SWIPE_SCORE_WEIGHTS.SKIP;
   }
 
   await Project.findByIdAndUpdate(projectId, updateData, { new: true });

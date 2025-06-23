@@ -4,36 +4,106 @@ import ErrorHandler from "../middlewares/error.js";
 import cloudinary from "cloudinary";
 import { Trending } from "../models/trendingSchema.js";
 
+//get all project with category sortby and search
 // export const getAllProjects = catchAsyncErrors(async (req, res, next) => {
-//   const projects = await Project.find({});
+//   const { category, sortBy, search } = req.query;
+  
+//   // Build query
+//   const query = {};
+//   if (category && category !== 'All') {
+//     query.category = category;
+//   }
+//   if (search) {
+//     // query.$text = { $search: search };
+//      query.title = { $regex: search, $options: 'i' };
+//   }
+
+//   // Build sort
+//   let sort = {};
+//   switch (sortBy) {
+//     case 'Recent':
+//       sort = { createdAt: -1 };
+//       break;
+//     case 'Most Liked':
+//       sort = { likes: -1 };
+//       break;
+//     case 'Trending':
+//       sort = { likes: -1, views: -1 };
+//       break;
+//     default:
+//       sort = { createdAt: -1 };
+//   }
+
+//   const projects = await Project.find(query)
+//     .sort(sort)
+//     .populate({
+//       path: 'postedBy',
+//       select: 'name profilepic'
+//     });
+
+//   //   const swipeCard = await Project.find(query)
+//   // .sort(sort)
+//   // .skip(skip)
+//   // .limit(limit)
+//   // .populate('postedBy', 'name profilepic');
+
 //   res.status(200).json({
 //     success: true,
 //     projects,
 //   });
 // });
 
-//get all project with category sortby and search
 export const getAllProjects = catchAsyncErrors(async (req, res, next) => {
-  const { category, sortBy, search } = req.query;
-  
-  // Build query
+  const { 
+    category, 
+    sortBy, 
+    search,
+    explore,
+    limit,
+    page,
+    excludeSwiped,
+    excludeOwn
+  } = req.query;
+
+  // Build base query
   const query = {};
+  
+  // Category filter
   if (category && category !== 'All') {
     query.category = category;
   }
+  
+  // Search filter
   if (search) {
-    // query.$text = { $search: search };
-     query.title = { $regex: search, $options: 'i' };
+    query.title = { $regex: search, $options: 'i' };
+  }
+
+  // Explore page specific filters
+  if (explore === 'true') {
+    if (excludeSwiped === 'true' && req.user?._id) {
+      const swipedProjects = await Swipe.find({ userId: req.user._id }).distinct('projectId');
+      if (swipedProjects.length > 0) {
+        query._id = { $nin: swipedProjects };
+      }
+    }
+
+    if (excludeOwn === 'true' && req.user?._id) {
+      query.postedBy = { $ne: req.user._id };
+    }
   }
 
   // Build sort
   let sort = {};
   switch (sortBy) {
     case 'Recent':
+    case 'Most Recent':
       sort = { createdAt: -1 };
       break;
     case 'Most Liked':
       sort = { likes: -1 };
+      break;
+    case 'Most Viewed':
+      sort = { views: -1 };
       break;
     case 'Trending':
       sort = { likes: -1, views: -1 };
@@ -42,18 +112,54 @@ export const getAllProjects = catchAsyncErrors(async (req, res, next) => {
       sort = { createdAt: -1 };
   }
 
+  // Pagination setup
+  const limitNum = explore === 'true' ? parseInt(limit) || 10 : 1000;
+  const pageNum = parseInt(page) || 1;
+  const skip = (pageNum - 1) * limitNum;
+
+  // Execute query
   const projects = await Project.find(query)
     .sort(sort)
+    .skip(skip)
+    .limit(limitNum)
     .populate({
       path: 'postedBy',
       select: 'name profilepic'
     });
 
-  res.status(200).json({
-    success: true,
-    projects,
-  });
+  // Response format
+  if (explore === 'true') {
+    res.status(200).json({
+      success: true,
+      count: projects.length,
+      page: pageNum,
+      hasMore: projects.length >= limitNum,
+      projects: projects.map(proj => ({
+        _id: proj._id,
+        title: proj.title,
+        description: proj.description,
+        tags: proj.tags,
+        category: proj.category,
+        likes: proj.likes,
+        views: proj.views,
+        commentsCount: proj.commentsCount,
+        postedBy: {
+          _id: proj.postedBy?._id,
+          name: proj.postedBy?.name,
+          profilepic: proj.postedBy?.profilepic
+        },
+        media: proj.media,
+        createdAt: proj.createdAt
+      }))
+    });
+  } else {
+    res.status(200).json({
+      success: true,
+      projects
+    });
+  }
 });
+
 
 //uploading single photo
 export const postProject = catchAsyncErrors(async(req,res,next)=> {
