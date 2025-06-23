@@ -16,6 +16,10 @@ export default function RandomIdea() {
     try {
       // Use environment variable for API URL
       const apiUrl = import.meta.env.VITE_API_URL;
+      console.log('API URL:', apiUrl);
+      if (!apiUrl) {
+  console.error("VITE_API_URL is not defined. Check your .env file.");
+}
       
       const response = await axios.post(
         `${apiUrl}/api/ideas/generate`,
