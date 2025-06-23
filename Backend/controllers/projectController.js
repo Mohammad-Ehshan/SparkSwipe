@@ -4,8 +4,51 @@ import ErrorHandler from "../middlewares/error.js";
 import cloudinary from "cloudinary";
 import { Trending } from "../models/trendingSchema.js";
 
+// export const getAllProjects = catchAsyncErrors(async (req, res, next) => {
+//   const projects = await Project.find({});
+//   res.status(200).json({
+//     success: true,
+//     projects,
+//   });
+// });
+
+//get all project with category sortby and search
 export const getAllProjects = catchAsyncErrors(async (req, res, next) => {
-  const projects = await Project.find({});
+  const { category, sortBy, search } = req.query;
+  
+  // Build query
+  const query = {};
+  if (category && category !== 'All') {
+    query.category = category;
+  }
+  if (search) {
+    // query.$text = { $search: search };
+     query.title = { $regex: search, $options: 'i' };
+  }
+
+  // Build sort
+  let sort = {};
+  switch (sortBy) {
+    case 'Recent':
+      sort = { createdAt: -1 };
+      break;
+    case 'Most Liked':
+      sort = { likes: -1 };
+      break;
+    case 'Trending':
+      sort = { likes: -1, views: -1 };
+      break;
+    default:
+      sort = { createdAt: -1 };
+  }
+
+  const projects = await Project.find(query)
+    .sort(sort)
+    .populate({
+      path: 'postedBy',
+      select: 'name profilepic'
+    });
+
   res.status(200).json({
     success: true,
     projects,
