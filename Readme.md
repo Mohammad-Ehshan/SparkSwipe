@@ -111,7 +111,7 @@ That's the question that sparked SparkSwipe's creation. Instead of scrolling thr
    npm run dev
    ```
 
-5. **Visit the application**
+5. **Visit the application in Incognito for avoid cookie failure**
    Open [http://localhost:8080](http://localhost:8080) in your browser
 
 ## 📖 Usage Guide
