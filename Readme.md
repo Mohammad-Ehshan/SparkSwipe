@@ -67,36 +67,51 @@ That's the question that sparked SparkSwipe's creation. Instead of scrolling thr
 2. **Install dependencies**
    ```bash
    # Install frontend dependencies
+   cd frontend
    npm install
 
    # Install backend dependencies
    cd backend
    npm install
-   cd ..
    ```
 
 3. **Environment Setup**
    ```bash
-   # Create .env file in the root directory
-   cp .env.example .env
+   #inside backend folder backend/config/config.env  and for frontend it will be at root frontend/.env
+   # Create .env file 
+   config/config.env
    
    # Add your environment variables
-   MONGODB_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret
-   CLOUDINARY_URL=your_cloudinary_url (optional, for image uploads)
+   MONGODB_URI=mongodb://localhost:27017/
+   PORT = 4000
+   CLOUDINARY_CLOUD_NAME=
+   CLOUDINARY_API_KEY=
+   CLOUDINARY_API_SECRET=
+   FRONTEND_URL=http://localhost:8080
+   JWT_SECRET_KEY=JWT_SECRET_KEY
+   JWT_EXPIRES=7d
+   COOKIE_EXPIRE=5
+   GEMINI_API_KEY=
+
+
+   .env
+   VITE_API_URL=http://localhost:4000
+
    ```
 
 4. **Start the development servers**
    ```bash
-   # Start backend server (runs on port 5000)
-   npm run server
+   # Start backend server (runs on port 4000)
+   cd backend
+   npm run dev
 
-   # In a new terminal, start frontend (runs on port 3000)
+   # In a new terminal, start frontend (runs on port 8080)
+   cd frontend
    npm run dev
    ```
 
 5. **Visit the application**
-   Open [http://localhost:3000](http://localhost:3000) in your browser
+   Open [http://localhost:8080](http://localhost:8080) in your browser
 
 ## 📖 Usage Guide
 
