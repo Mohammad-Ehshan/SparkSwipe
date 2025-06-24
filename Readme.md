@@ -137,17 +137,16 @@ That's the question that sparked SparkSwipe's creation. Instead of scrolling thr
 
 ## 📸 Screenshots
 
+### Login Page
+![SparkSwipe Login](https://drive.google.com/file/d/1Cl3kVPKp1Fa_15l8WNy_h_Xh5lX-ts5Y/view?usp=sharing)
+
 ### Landing Page
-![SparkSwipe Landing](https://via.placeholder.com/800x400/4ade80/ffffff?text=SparkSwipe+Landing+Page)
+![SparkSwipe Landing](https://drive.google.com/file/d/14VjOa3uPKGd0RSwDX3xjgCRfq4qGgDTg/view?usp=sharing)
 *Clean, professional landing page with clear value proposition*
 
 ### Swipe Interface
-![Swipe Interface](https://via.placeholder.com/800x400/10b981/ffffff?text=Tinder-Style+Swipe+Interface)
+![Swipe Interface](https://drive.google.com/file/d/1x9A90fIWwE8qMH6ptW4YMMVL6YjsHuXO/view?usp=sharing)
 *Intuitive card-based swiping for idea discovery*
-
-### Idea Details
-![Idea Details](https://via.placeholder.com/800x400/059669/ffffff?text=Detailed+Idea+View)
-*Comprehensive idea presentations with media and engagement metrics*
 
 ## 🤝 Contributing
 
