@@ -6,7 +6,7 @@
 [![GitHub Forks](https://img.shields.io/github/forks/Mohammad-Ehshan/SparkSwipe?style=for-the-badge)](https://github.com/Mohammad-Ehshan/SparkSwipe/network)
 
 
-> **Where Great Ideas Come to Life** 💡
+> **Where Great Ideas Come to Life** 💡(Live demo some features are not working currently)
 
 ## 🌟 Overview
 
