@@ -2,8 +2,8 @@
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-sparkswipe.netlify.app-brightgreen?style=for-the-badge)](https://sparkswipe.netlify.app)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](#license)
-[![GitHub Stars](https://img.shields.io/github/stars/yourusername/SparkSwipe?style=for-the-badge)](https://github.com/yourusername/SparkSwipe/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/yourusername/SparkSwipe?style=for-the-badge)](https://github.com/yourusername/SparkSwipe/network)
+[![GitHub Stars](https://img.shields.io/github/stars/yourusername/SparkSwipe?style=for-the-badge)]((https://github.com/Mohammad-Ehshan/SparkSwipe)
+[![GitHub Forks](https://img.shields.io/github/forks/yourusername/SparkSwipe?style=for-the-badge)](https://[github.com/yourusername/SparkSwipe/network](https://github.com/Mohammad-Ehshan/SparkSwipe)
 
 > **Where Great Ideas Come to Life** 💡
 
