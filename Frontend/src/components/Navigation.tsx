@@ -189,7 +189,7 @@ import { motion } from 'framer-motion';
 import { Home, Search, Plus, Heart, User, Menu, X, List } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { useAuth } from '@/context/authContext';
+import { useAuth } from '@/context/AuthContext';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -200,7 +200,7 @@ const Navigation = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.get('https://sparkswipebackend.onrender.com/api/v1/user/logout', {
+      const response = await axios.get('http://localhost:4000/api/v1/user/logout', {
         withCredentials: true,
       });
       toast.success(response.data.message);

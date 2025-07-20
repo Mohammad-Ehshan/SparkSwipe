@@ -1,9 +1,10 @@
-import { Heart, Eye, MessageCircle, TrendingUp } from 'lucide-react';
+import { useState } from 'react';
+import { Heart, Eye, MessageCircle, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
+import { Input } from '@/components/ui/input';
 
 export interface Startup {
   _id: string;
@@ -46,12 +47,56 @@ export interface Startup {
 
 interface StartupCardProps {
   startup: Startup;
+  onLike?: (startupId: string) => void;
+  comments?: Array<{
+    id: string;
+    text: string;
+    user: string;
+    createdAt: string;
+  }>;
+  showComments?: boolean;
+  onCommentClick?: (startupId: string) => void;
+  newComment?: string;
+  onCommentChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onCommentSubmit?: (startupId: string) => void;
 }
 
-const StartupCard = ({ startup }: StartupCardProps) => {
+const StartupCard = ({ 
+  startup, 
+  onLike,
+  comments = [], 
+  showComments = false, 
+  onCommentClick, 
+  newComment = '', 
+  onCommentChange, 
+  onCommentSubmit
+}: StartupCardProps) => {
+  const [localLikes, setLocalLikes] = useState(startup.likes || 0);
+  const [isLiked, setIsLiked] = useState(false);
+
   const formatCount = (count: number) => {
     if (count >= 1000) return `${(count / 1000).toFixed(1)}k`;
     return count.toString();
+  };
+
+  const handleLike = () => {
+    const newLikeStatus = !isLiked;
+    setIsLiked(newLikeStatus);
+    
+    // Update local likes count immediately for responsive UI
+    setLocalLikes(prev => newLikeStatus ? prev + 1 : prev - 1);
+    
+    // Call the parent like handler if provided
+    if (onLike) {
+      onLike(startup._id);
+    }
+  };
+
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onCommentSubmit && newComment.trim()) {
+      onCommentSubmit(startup._id);
+    }
   };
 
   // Get first image URL if available
@@ -127,13 +172,14 @@ const StartupCard = ({ startup }: StartupCardProps) => {
           <div className="flex items-center justify-between pt-4 mt-4 border-t border-gray-100">
             <div className="flex items-center gap-4">
               <motion.button
-                className="flex items-center gap-1 text-gray-500 hover:text-red-500 transition-colors"
+                className={`flex items-center gap-1 transition-colors ${isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={handleLike}
               >
-                <Heart className="w-4 h-4" />
+                <Heart className="w-4 h-4" fill={isLiked ? 'currentColor' : 'none'} />
                 <span className="text-sm font-medium">
-                  {formatCount(startup.likes || 0)}
+                  {formatCount(localLikes)}
                 </span>
               </motion.button>
               
@@ -144,18 +190,61 @@ const StartupCard = ({ startup }: StartupCardProps) => {
                 </span>
               </div>
               
-              <div className="flex items-center gap-1 text-gray-500">
+              <motion.button
+                className={`flex items-center gap-1 ${showComments ? 'text-blue-500' : 'text-gray-500 hover:text-blue-500'}`}
+                onClick={() => onCommentClick?.(startup._id)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <MessageCircle className="w-4 h-4" />
                 <span className="text-sm">
-                  {formatCount(startup.commentsCount || 0)}
+                  {formatCount(comments.length || startup.commentsCount || 0)}
                 </span>
-              </div>
+              </motion.button>
             </div>
             
             <div className="text-xs text-gray-400">
               {new Date(startup.createdAt).toLocaleDateString()}
             </div>
           </div>
+
+          {/* Comments Section */}
+          {showComments && (
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="space-y-3 mb-4 max-h-40 overflow-y-auto">
+                {comments.length > 0 ? (
+                  comments.map(comment => (
+                    <div key={comment.id} className="text-sm">
+                      <p className="font-medium">{comment.user}</p>
+                      <p className="text-gray-600">{comment.text}</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {new Date(comment.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-sm">No comments yet</p>
+                )}
+              </div>
+              
+              <form onSubmit={handleCommentSubmit} className="flex gap-2">
+                <Input
+                  type="text"
+                  value={newComment}
+                  onChange={onCommentChange}
+                  placeholder="Add a comment..."
+                  className="flex-1 text-sm"
+                />
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  disabled={!newComment.trim()}
+                >
+                  <Send size={16} />
+                </button>
+              </form>
+            </div>
+          )}
         </CardContent>
       </Card>
     </motion.div>
