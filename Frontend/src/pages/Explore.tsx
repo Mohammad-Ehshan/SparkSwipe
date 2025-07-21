@@ -305,7 +305,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SwipeCard from '@/components/SwipeCard';
 import { Filter, TrendingUp, Clock, Tag, Check } from 'lucide-react';
 import axios from 'axios';
-import { useAuth } from '@/context/authContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface Project {
   _id: string;
@@ -416,7 +416,7 @@ const Explore = () => {
               'Most Viewed'
     };
 
-    const res = await axios.get('https://sparkswipebackend.onrender.com/api/v1/project/getall', { 
+    const res = await axios.get('http://localhost:4000/api/v1/project/getall', { 
       params,
       withCredentials: true, // ✅ Use cookies
     });
@@ -476,7 +476,7 @@ const Explore = () => {
       direction === 'right' ? 'like' : 
       direction === 'left' ? 'dislike' : 'skip';
     
-    await axios.post('https://sparkswipebackend.onrender.com/api/v1/swipe/', {
+    await axios.post('http://localhost:4000/api/v1/swipe/', {
       projectId: currentProject._id,
       action
     }, {

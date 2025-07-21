@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Upload, Tag, Eye, X } from "lucide-react";
+import { Upload, Tag, Eye, X, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
-import { useAuth } from "@/context/authContext";
+import { useAuth } from "@/context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 
 const PostIdea = () => {
@@ -23,7 +23,7 @@ const PostIdea = () => {
       }
       try {
         const { data } = await axios.get(
-          "https://sparkswipebackend.onrender.com/api/v1/user/getuser",
+          "http://localhost:4000/api/v1/user/getuser",
           {
             withCredentials: true,
           }
@@ -56,6 +56,8 @@ const PostIdea = () => {
 
   const [currentTag, setCurrentTag] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isImproving, setIsImproving] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState(null);
 
   const categories = [
     "AI/ML",
@@ -111,7 +113,7 @@ const PostIdea = () => {
       if (formData.image) data.append("file", formData.image);
 
       const response = await axios.post(
-        "https://sparkswipebackend.onrender.com/api/v1/project/post",
+        "http://localhost:4000/api/v1/project/post",
         data,
         {
           headers: {
@@ -130,11 +132,47 @@ const PostIdea = () => {
         tags: [],
         image: null,
       });
+      setAiSuggestions(null);
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const getAIImprovements = async () => {
+    if (!formData.title || !formData.fullDescription) {
+      toast.error("Please fill in title and description first");
+      return;
+    }
+
+    setIsImproving(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/v1/ai/improve-idea",
+        {
+          title: formData.title,
+          description: formData.fullDescription,
+          category: formData.category,
+          tags: formData.tags,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      setAiSuggestions(response.data.suggestions);
+      toast.success("AI suggestions generated!");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to get AI improvements");
+    } finally {
+      setIsImproving(false);
+    }
+  };
+
+  const applySuggestion = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    setAiSuggestions(null); // Close suggestions after applying one
   };
 
   return (
@@ -167,11 +205,44 @@ const PostIdea = () => {
               onSubmit={handleSubmit}
               className="bg-white rounded-2xl shadow-xl p-8 space-y-6"
             >
+              {/* AI Improvement Button */}
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={getAIImprovements}
+                  disabled={isImproving}
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors disabled:opacity-50"
+                >
+                  {isImproving ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-purple-700 border-t-transparent rounded-full animate-spin" />
+                      <span>Analyzing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={18} />
+                      <span>Improve with AI</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
               {/* Title */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
-                  Idea Title *
-                </label>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-semibold text-gray-900">
+                    Idea Title *
+                  </label>
+                  {aiSuggestions?.title && (
+                    <button
+                      type="button"
+                      onClick={() => applySuggestion('title', aiSuggestions.title)}
+                      className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200"
+                    >
+                      Apply Suggestion
+                    </button>
+                  )}
+                </div>
                 <input
                   type="text"
                   value={formData.title}
@@ -180,6 +251,12 @@ const PostIdea = () => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   required
                 />
+                {aiSuggestions?.title && (
+                  <div className="mt-2 p-3 bg-purple-50 rounded-lg border border-purple-100">
+                    <p className="text-sm text-purple-800 font-medium">AI Suggestion:</p>
+                    <p className="text-sm text-purple-700">{aiSuggestions.title}</p>
+                  </div>
+                )}
               </div>
 
               {/* Category */}
@@ -205,11 +282,21 @@ const PostIdea = () => {
               </div>
 
               {/* Short Description */}
-              {/* Currently not updating in database because database don't have short desciption field  */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
-                  Short Description * (for card preview)
-                </label>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-semibold text-gray-900">
+                    Short Description * (for card preview)
+                  </label>
+                  {aiSuggestions?.shortDescription && (
+                    <button
+                      type="button"
+                      onClick={() => applySuggestion('shortDescription', aiSuggestions.shortDescription)}
+                      className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200"
+                    >
+                      Apply Suggestion
+                    </button>
+                  )}
+                </div>
                 <textarea
                   value={formData.shortDescription}
                   onChange={(e) =>
@@ -224,13 +311,30 @@ const PostIdea = () => {
                 <p className="text-sm text-gray-500 mt-1">
                   {formData.shortDescription.length}/200 characters
                 </p>
+                {aiSuggestions?.shortDescription && (
+                  <div className="mt-2 p-3 bg-purple-50 rounded-lg border border-purple-100">
+                    <p className="text-sm text-purple-800 font-medium">AI Suggestion:</p>
+                    <p className="text-sm text-purple-700">{aiSuggestions.shortDescription}</p>
+                  </div>
+                )}
               </div>
 
               {/* Full Description */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
-                  Full Description *
-                </label>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-semibold text-gray-900">
+                    Full Description *
+                  </label>
+                  {aiSuggestions?.fullDescription && (
+                    <button
+                      type="button"
+                      onClick={() => applySuggestion('fullDescription', aiSuggestions.fullDescription)}
+                      className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200"
+                    >
+                      Apply Suggestion
+                    </button>
+                  )}
+                </div>
                 <textarea
                   value={formData.fullDescription}
                   onChange={(e) =>
@@ -241,13 +345,33 @@ const PostIdea = () => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all resize-none"
                   required
                 />
+                {aiSuggestions?.fullDescription && (
+                  <div className="mt-2 p-3 bg-purple-50 rounded-lg border border-purple-100">
+                    <p className="text-sm text-purple-800 font-medium">AI Suggestion:</p>
+                    <p className="text-sm text-purple-700">{aiSuggestions.fullDescription}</p>
+                  </div>
+                )}
               </div>
 
               {/* Tags */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
-                  Tags
-                </label>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-semibold text-gray-900">
+                    Tags
+                  </label>
+                  {aiSuggestions?.tags && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData(prev => ({ ...prev, tags: [...prev.tags, ...aiSuggestions.tags.filter(tag => !prev.tags.includes(tag))] }));
+                        setAiSuggestions(null);
+                      }}
+                      className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200"
+                    >
+                      Apply Suggestions
+                    </button>
+                  )}
+                </div>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {formData.tags.map((tag, index) => (
                     <span
@@ -284,10 +408,23 @@ const PostIdea = () => {
                     <Tag size={18} />
                   </button>
                 </div>
+                {aiSuggestions?.tags && (
+                  <div className="mt-2 p-3 bg-purple-50 rounded-lg border border-purple-100">
+                    <p className="text-sm text-purple-800 font-medium mb-1">AI Suggested Tags:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {aiSuggestions.tags
+                        .filter(tag => !formData.tags.includes(tag))
+                        .map((tag, index) => (
+                          <span key={index} className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                            #{tag}
+                          </span>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Image Upload */}
-
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Image
@@ -375,7 +512,6 @@ const PostIdea = () => {
               <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-6">
                 <div className="flex items-center space-x-3 mb-4">
                   {userData.profilepic ? (
-                    // Display Cloudinary profile picture if available
                     <div className="w-10 h-10 rounded-full overflow-hidden">
                       <img
                         src={userData.profilepic}
@@ -384,7 +520,6 @@ const PostIdea = () => {
                       />
                     </div>
                   ) : (
-                    // Fallback gradient circle with user's initial
                     <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
                       <span className="text-white font-semibold text-sm">
                         {userData.name
@@ -462,6 +597,10 @@ const PostIdea = () => {
                 <li className="flex items-start space-x-2">
                   <span className="text-green-500 font-bold">•</span>
                   <span>Add a high-quality image if possible</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-green-500 font-bold">•</span>
+                  <span>Use the AI improvement feature to refine your idea</span>
                 </li>
               </ul>
             </div>

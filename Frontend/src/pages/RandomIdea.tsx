@@ -1,12 +1,29 @@
 import { useState } from 'react';
 import axios from 'axios';
 import IdeaForm from '@/components/IdeaGenerator/IdeaForm';
-import IdeaCard from '@/components/IdeaGenerator/IdeaCard';
+
+interface GeneratedIdea {
+  content: string;
+  visualConcept: string;
+  imageUrl?: string; // Will be used when actual image generation is available
+}
 
 export default function RandomIdea() {
-  const [ideas, setIdeas] = useState<string[]>([]);
+  const [ideas, setIdeas] = useState<GeneratedIdea[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const parseIdeaContent = (content: string) => {
+    const sections: Record<string, string> = {};
+    const sectionRegex = /\[(.*?)\]:\s*([\s\S]*?)(?=\n\[|$)/g;
+    let match;
+    
+    while ((match = sectionRegex.exec(content)) !== null) {
+      sections[match[1]] = match[2].trim();
+    }
+
+    return sections;
+  };
 
   const handleGenerate = async (formData: any) => {
     setLoading(true);
@@ -14,12 +31,10 @@ export default function RandomIdea() {
     setIdeas([]);
     
     try {
-      // Use environment variable for API URL
       const apiUrl = import.meta.env.VITE_API_URL;
-      console.log('API URL:', apiUrl);
       if (!apiUrl) {
-  console.error("VITE_API_URL is not defined. Check your .env file.");
-}
+        throw new Error("API URL is not configured");
+      }
       
       const response = await axios.post(
         `${apiUrl}/api/ideas/generate`,
@@ -28,45 +43,34 @@ export default function RandomIdea() {
           headers: {
             'Content-Type': 'application/json'
           },
-          timeout: 30000 
+          timeout: 60000
         }
       );
       
-      // Split the response into individual ideas
-      const ideaBlocks = response.data.ideas.split(/(?=\d+\.\s+\*\*)/g);
-      setIdeas(ideaBlocks.filter((block: string) => block.trim()));
+      setIdeas(response.data.ideas);
     } catch (err: any) {
       let errorMessage = 'Failed to generate ideas. ';
       
       if (err.response) {
-       
         if (err.response.status === 404) {
           errorMessage += 'Endpoint not found. Please check:';
-          errorMessage += '\n• Backend is running on port 5000';
-          errorMessage += '\n• Route is mounted at /api/ideas/generate';
+          errorMessage += '\n• Backend is running';
+          errorMessage += '\n• Route is correct (/api/ideas/generate)';
         } else {
           errorMessage += `Server error: ${err.response.status} - ${err.response.data?.message || 'No additional info'}`;
         }
       } else if (err.request) {
-        // agr respon recv n hua to
         errorMessage += 'No response from server. Check:';
-        errorMessage += '\n• Backend server is running (npm run dev)';
-        errorMessage += '\n• No firewall blocking port 5000';
+        errorMessage += '\n• Backend server is running';
         errorMessage += '\n• Network connectivity';
       } else if (err.code === 'ECONNABORTED') {
-        errorMessage += 'Request timed out. Gemini API might be slow.';
+        errorMessage += 'Request timed out. Please try again.';
       } else {
-       
         errorMessage += `Error: ${err.message}`;
       }
       
-      errorMessage += '\n\nTroubleshooting:';
-      errorMessage += '\n1. Check backend console for errors';
-      errorMessage += '\n2. Verify .env files in both frontend/backend';
-      errorMessage += '\n3. Test with curl command (see instructions)';
-      
       setError(errorMessage);
-      console.error('Full error details:', err);
+      console.error('Error details:', err);
     } finally {
       setLoading(false);
     }
@@ -77,7 +81,7 @@ export default function RandomIdea() {
       <div className="text-center mb-10">
         <h1 className="text-4xl font-bold text-gray-800 mb-2">Smart Idea Generator</h1>
         <p className="text-gray-600">
-          Fill out the form and let AI generate innovative project ideas
+          Get complete project ideas with visual concepts
         </p>
       </div>
       
@@ -92,9 +96,9 @@ export default function RandomIdea() {
           {loading && (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mx-auto"></div>
-              <p className="mt-4 text-gray-700 font-medium">Generating ideas...</p>
+              <p className="mt-4 text-gray-700 font-medium">Creating innovative ideas...</p>
               <p className="text-gray-500 text-sm mt-2">
-                This might take 10-30 seconds depending on Gemini API response
+                Generating complete project concepts with visual descriptions
               </p>
             </div>
           )}
@@ -111,23 +115,96 @@ export default function RandomIdea() {
                   <p className="text-sm text-red-700 whitespace-pre-wrap">{error}</p>
                 </div>
               </div>
-              <div className="mt-4">
-                <h3 className="font-medium text-red-800">How to troubleshoot:</h3>
-                <ol className="list-decimal list-inside text-red-700 text-sm mt-2 space-y-1">
-                  <li>Check backend terminal for errors</li>
-                  <li>Verify backend is running on port 5000</li>
-                  <li>Test endpoint with curl command</li>
-                  <li>Confirm Gemini API key is valid</li>
-                </ol>
-              </div>
             </div>
           )}
           
           {!loading && ideas.length > 0 && (
-            <div className="space-y-6">
-              {ideas.map((idea, index) => (
-                <IdeaCard key={index} content={idea} />
-              ))}
+            <div className="space-y-8">
+              {ideas.map((idea, index) => {
+                const sections = parseIdeaContent(idea.content);
+                const title = sections['Title'] || `Idea ${index + 1}`;
+                
+                return (
+                  <div key={index} className="border rounded-lg overflow-hidden shadow-sm bg-gray-50">
+                    {/* Placeholder for when actual images are available */}
+                    {idea.imageUrl ? (
+                      <div className="h-48 bg-gray-100 overflow-hidden">
+                        <img 
+                          src={idea.imageUrl} 
+                          alt={`Visual representation of ${title}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6">
+                        <div className="flex items-center gap-4">
+                          <div className="bg-white p-3 rounded-lg shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 className="font-medium text-gray-800">Visual Concept</h3>
+                            <p className="text-sm text-gray-600">{idea.visualConcept}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-gray-800 mb-4">{title}</h3>
+                      
+                      <div className="space-y-4">
+                        {sections['Pitch'] && (
+                          <div>
+                            <h4 className="font-semibold text-gray-700 mb-1">Pitch</h4>
+                            <p className="text-gray-600">{sections['Pitch']}</p>
+                          </div>
+                        )}
+                        
+                        {sections['Key Features'] && (
+                          <div>
+                            <h4 className="font-semibold text-gray-700 mb-1">Key Features</h4>
+                            <ul className="list-disc list-inside text-gray-600 space-y-1">
+                              {sections['Key Features'].split('\n').filter(f => f.trim()).map((feature, i) => (
+                                <li key={i}>{feature.replace(/^- /, '').trim()}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        
+                        {sections['Market Need'] && (
+                          <div>
+                            <h4 className="font-semibold text-gray-700 mb-1">Market Need</h4>
+                            <p className="text-gray-600">{sections['Market Need']}</p>
+                          </div>
+                        )}
+                        
+                        {sections['Technology'] && (
+                          <div>
+                            <h4 className="font-semibold text-gray-700 mb-1">Technology</h4>
+                            <p className="text-gray-600">{sections['Technology']}</p>
+                          </div>
+                        )}
+                        
+                        {sections['Business Model'] && (
+                          <div>
+                            <h4 className="font-semibold text-gray-700 mb-1">Business Model</h4>
+                            <p className="text-gray-600">{sections['Business Model']}</p>
+                          </div>
+                        )}
+                        
+                        {sections['Bonus Tips'] && (
+                          <div className="bg-blue-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-blue-700 mb-1">Bonus Tips</h4>
+                            <p className="text-blue-600">{sections['Bonus Tips']}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
           
@@ -137,6 +214,7 @@ export default function RandomIdea() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
               <p className="mt-4">Fill the form and click "Generate Ideas" to get started</p>
+              <p className="text-sm mt-2">Each idea will include detailed descriptions and visual concepts</p>
             </div>
           )}
         </div>

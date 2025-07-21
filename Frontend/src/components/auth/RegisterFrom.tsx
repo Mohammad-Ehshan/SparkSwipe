@@ -540,7 +540,7 @@ const RegisterForm = ({ onToggleMode }: { onToggleMode: () => void }) => {
 
     try {
       const { data } = await axios.post(
-        "https://sparkswipebackend.onrender.com/api/v1/user/register",
+        "http://localhost:4000/api/v1/user/register",
         payload,
         {
           headers: { "Content-Type": "multipart/form-data" },
